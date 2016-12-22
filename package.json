@@ -1,0 +1,36 @@
+{
+  "name": "crypto-conditions-meta",
+  "version": "1.0.0",
+  "description": "Crypto-conditions spec and tests",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/interledger/crypto-conditions.git"
+  },
+  "keywords": [
+    "crypto-conditions",
+    "spec",
+    "test",
+    "vectors",
+    "testsuite",
+    "suite",
+    "unit",
+    "cases",
+    "crypto",
+    "verify"
+  ],
+  "author": "Interledger Team <info@interledger.org>",
+  "license": "Apache-2.0",
+  "bugs": {
+    "url": "https://github.com/interledger/crypto-conditions/issues"
+  },
+  "homepage": "https://github.com/interledger/crypto-conditions#readme",
+  "devDependencies": {
+    "lodash": "^4.17.2",
+    "mustache": "^2.3.0",
+    "xmldoc": "^0.5.1"
+  }
+}

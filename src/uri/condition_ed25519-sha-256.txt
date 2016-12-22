@@ -1,0 +1,1 @@
+ni:sha-256;{{fingerprint}}?fpt=ed25519-sha-256&cost={{cost}}

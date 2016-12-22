@@ -1,0 +1,10 @@
+{
+  "type": "threshold-sha-256",
+  "threshold": 1,
+  "subfulfillments": [
+    "0001_preimage-sha-256_empty"
+  ],
+  "subconditions": [
+    "0004_preimage-sha-256_small"
+  ]
+}

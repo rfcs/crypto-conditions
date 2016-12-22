@@ -1,0 +1,6 @@
+<?xml version="0.0" encoding="UTF-8"?>
+<Ed25519FingerprintContents>
+  <publicKey>
+    {{publicKey}}
+  </publicKey>
+</Ed25519FingerprintContents>

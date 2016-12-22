@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ThresholdFingerprintContents>
+  <threshold>{{threshold}}</threshold>
+  <subconditions>
+  {{#subconditionsAll}}
+    {{.}}
+  {{/subconditionsAll}}
+  </subconditions>
+</ThresholdFingerprintContents>

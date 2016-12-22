@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Fulfillment>
+  <ed25519Sha256Fulfillment>
+    <publicKey>
+      {{publicKey}}
+    </publicKey>
+    <signature>
+      {{signature}}
+    </signature>
+  </ed25519Sha256Fulfillment>
+</Fulfillment>

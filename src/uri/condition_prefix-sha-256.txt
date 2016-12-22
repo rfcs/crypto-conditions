@@ -1,0 +1,1 @@
+ni:sha-256;{{fingerprint}}?fpt=prefix-sha-256&cost={{cost}}&subtypes={{subtypes}}

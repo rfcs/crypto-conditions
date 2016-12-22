@@ -1,0 +1,1 @@
+ni:sha-256;{{fingerprint}}?fpt=threshold-sha-256&cost={{cost}}&subtypes={{subtypes}}

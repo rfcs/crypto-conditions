@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Condition>
+  <preimageSha256Condition>
+    <fingerprint>
+      {{fingerprint}}
+    </fingerprint>
+    <cost>{{cost}}</cost>
+  </preimageSha256Condition>
+</Condition>
