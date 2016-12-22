@@ -8,8 +8,11 @@ const execSync = require('child_process').execSync
 const Mustache = require('mustache')
 Mustache.escape = a => a
 const xmldoc = require('xmldoc')
+const base64url = require('base64url')
 const uniq = require('lodash/uniq')
 const flatten = require('lodash/flatten')
+
+const ed25519 = require('../src/lib/ed25519')
 
 const jsonPath = path.resolve(__dirname, '../src/json')
 const jsonSuites = fs.readdirSync(jsonPath)
@@ -19,14 +22,6 @@ const uriPath = path.resolve(__dirname, '../src/uri')
 const distPath = path.resolve(__dirname, '../dist')
 const asnPath = path.resolve(__dirname, '../src/asn1/CryptoConditions.asn')
 const outputPath = path.resolve(__dirname, '../test-vectors')
-
-const base64url = (buffer) => {
-  return buffer
-    .toString('base64')
-    .replace(/=/g, "")
-    .replace(/\+/g, "-")
-    .replace(/\//g, "_")
-}
 
 const FINGERPRINT_ASN_TYPES = {
   // Preimage doesn't have an ASN-encoded fingerprint. The fingerprint contents
@@ -89,9 +84,10 @@ const hydrateTestCaseDefinition = (testCaseDefinitionJson) => {
     testCaseDefinition.message = Buffer.from(testCaseDefinitionJson.message, 'base64')
     testCaseDefinition.cost = square(testCaseDefinition.modulus.length)
   } else if (testCaseDefinitionJson.type === 'ed25519-sha-256') {
-    testCaseDefinition.publicKey = Buffer.from(testCaseDefinitionJson.publicKey, 'base64')
-    testCaseDefinition.signature = Buffer.from(testCaseDefinitionJson.signature, 'base64')
+    testCaseDefinition.privateKey = Buffer.from(testCaseDefinitionJson.privateKey, 'base64')
+    testCaseDefinition.publicKey = ed25519.getPublicKey(testCaseDefinition.privateKey)
     testCaseDefinition.message = Buffer.from(testCaseDefinitionJson.message, 'base64')
+    testCaseDefinition.signature = ed25519.sign(testCaseDefinition.message, testCaseDefinition.privateKey)
     testCaseDefinition.cost = 131072
   }
 
@@ -214,103 +210,102 @@ const getTemplateProps = (testCaseDefinition) => {
 const XML_PREAMBLE = '<?xml version="1.0" encoding="UTF-8"?>\n'
 const normalizeXml = xml => XML_PREAMBLE + new xmldoc.XmlDocument(xml).toString()
 
-for (let suite of jsonSuites) {
-  const suitePath = path.resolve(jsonPath, suite)
+const suite = 'valid'
+const suitePath = path.resolve(jsonPath, suite)
 
-  for (let testCase of fs.readdirSync(suitePath)) {
-    const testName = testCase.replace(/\.json$/, '')
-    const testPath = path.resolve(suitePath, testCase)
-    const testOutputPath = path.resolve(outputPath, `${suite}/${testCase}`)
-    const testCaseDefinition = hydrateTestCaseDefinition(require(testPath))
-    const type = testCase.split('_')[1]
+for (let testCase of fs.readdirSync(suitePath)) {
+  const testName = testCase.replace(/\.json$/, '')
+  const testPath = path.resolve(suitePath, testCase)
+  const testOutputPath = path.resolve(outputPath, `${suite}/${testCase}`)
+  const testCaseDefinition = hydrateTestCaseDefinition(require(testPath))
+  const type = testCase.split('_')[1]
 
-    const testData = getTestData(testCaseDefinition)
-    const templateProps = getTemplateProps(testCaseDefinition)
+  const testData = getTestData(testCaseDefinition)
+  const templateProps = getTemplateProps(testCaseDefinition)
 
-    // Generate fingerprint
-    if (type === 'preimage-sha-256') {
-      testData.fingerprintContents = testCaseDefinition.preimage.toString('hex').toUpperCase()
-    } else {
-      const xmlFingerprintPath = path.resolve(distPath, `${suite}_${testName}_fingerprint.xml`)
-      const derFingerprintPath = path.resolve(distPath, `${suite}_${testName}_fingerprint.der`)
-      const xmlFingerprintTemplate = fs.readFileSync(path.resolve(xmlPath, `fingerprint_${type}.xml`), 'utf-8')
-      const xmlFingerprint = Mustache.render(xmlFingerprintTemplate, templateProps)
+  // Generate fingerprint
+  if (type === 'preimage-sha-256') {
+    testData.fingerprintContents = testCaseDefinition.preimage.toString('hex').toUpperCase()
+  } else {
+    const xmlFingerprintPath = path.resolve(distPath, `${suite}_${testName}_fingerprint.xml`)
+    const derFingerprintPath = path.resolve(distPath, `${suite}_${testName}_fingerprint.der`)
+    const xmlFingerprintTemplate = fs.readFileSync(path.resolve(xmlPath, `fingerprint_${type}.xml`), 'utf-8')
+    const xmlFingerprint = Mustache.render(xmlFingerprintTemplate, templateProps)
 
-      fs.writeFileSync(xmlFingerprintPath, normalizeXml(xmlFingerprint))
+    fs.writeFileSync(xmlFingerprintPath, normalizeXml(xmlFingerprint))
 
-      const fingerprintAsnType = FINGERPRINT_ASN_TYPES[type]
-      execSync(
-        `ffasn1dump -I xer -O der ${asnPath} ${fingerprintAsnType} ` +
-        `${xmlFingerprintPath} ${derFingerprintPath}`
-      )
-
-      const fingerprintData = fs.readFileSync(derFingerprintPath)
-      testData.fingerprintContents = fingerprintData.toString('hex').toUpperCase()
-    }
-
-    // Generate fulfillment
-    const xmlFulfillmentPath = path.resolve(distPath, `${suite}_${testName}_fulfillment.xml`)
-    const derFulfillmentPath = path.resolve(distPath, `${suite}_${testName}_fulfillment.der`)
-    const xmlFulfillmentTemplate = fs.readFileSync(path.resolve(xmlPath, `fulfillment_${type}.xml`), 'utf-8')
-    const xmlFulfillment = Mustache.render(xmlFulfillmentTemplate, templateProps)
-
-    fs.writeFileSync(xmlFulfillmentPath, normalizeXml(xmlFulfillment))
-
+    const fingerprintAsnType = FINGERPRINT_ASN_TYPES[type]
     execSync(
-      `ffasn1dump -I xer -O der ${asnPath} Fulfillment ` +
-      `${xmlFulfillmentPath} ${derFulfillmentPath}`
+      `ffasn1dump -I xer -O der ${asnPath} ${fingerprintAsnType} ` +
+      `${xmlFingerprintPath} ${derFingerprintPath}`
     )
 
-    const fulfillmentData = fs.readFileSync(derFulfillmentPath)
-    testData.fulfillment = fulfillmentData.toString('hex').toUpperCase()
-
-    // Generate condition
-    const uriConditionPath = path.resolve(uriPath, `condition_${type}.txt`)
-    const xmlSrcConditionPath = path.resolve(xmlPath, `condition_${type}.xml`)
-    const xmlDstConditionPath = path.resolve(distPath, `${suite}_${testName}_condition.xml`)
-    const derConditionPath = path.resolve(distPath, `${suite}_${testName}_condition.der`)
-    const fingerprint = crypto
-      .createHash('sha256')
-      .update(Buffer.from(testData.fingerprintContents, 'hex'))
-      .digest()
-
-    const fingerprintHex = formattedHex(fingerprint)
-
-    let subtypesBitarrayString = ''
-    if (testCaseDefinition.subtypes) {
-      const subtypeBits = testCaseDefinition.subtypes.map(x => SUBTYPES_BITS[x])
-      const largestBit = subtypeBits.reduce((a, b) => Math.max(a, b), 0)
-      const subtypesBitarray = new Array(largestBit).fill(0)
-      for (let subtypeBit of subtypeBits) {
-        subtypesBitarray[subtypeBit] = 1
-      }
-      subtypesBitarrayString = subtypesBitarray.join('')
-    }
-
-    templateProps.fingerprint = formattedHex(fingerprint)
-    templateProps.subtypes = subtypesBitarrayString
-
-    const srcConditionXmlData = fs.readFileSync(xmlSrcConditionPath, 'utf-8')
-    const dstConditionXmlData = Mustache.render(srcConditionXmlData, templateProps)
-
-    const srcConditionUriData = fs.readFileSync(uriConditionPath, 'utf-8')
-    const dstConditionUriData = srcConditionUriData
-      .replace('{{fingerprint}}', base64url(fingerprint))
-      .replace('{{cost}}', testCaseDefinition.cost)
-      .replace('{{subtypes}}', (testCaseDefinition.subtypes || []).join(','))
-      .replace(/\n$/, '')
-
-    fs.writeFileSync(xmlDstConditionPath, dstConditionXmlData)
-
-    execSync(
-      `ffasn1dump -I xer -O der ${asnPath} Condition ` +
-      `${xmlDstConditionPath} ${derConditionPath}`
-    )
-
-    const conditionData = fs.readFileSync(derConditionPath)
-    testData.conditionBinary = conditionData.toString('hex').toUpperCase()
-    testData.conditionUri = dstConditionUriData
-
-    fs.writeFileSync(testOutputPath, JSON.stringify(testData, null, 2))
+    const fingerprintData = fs.readFileSync(derFingerprintPath)
+    testData.fingerprintContents = fingerprintData.toString('hex').toUpperCase()
   }
+
+  // Generate fulfillment
+  const xmlFulfillmentPath = path.resolve(distPath, `${suite}_${testName}_fulfillment.xml`)
+  const derFulfillmentPath = path.resolve(distPath, `${suite}_${testName}_fulfillment.der`)
+  const xmlFulfillmentTemplate = fs.readFileSync(path.resolve(xmlPath, `fulfillment_${type}.xml`), 'utf-8')
+  const xmlFulfillment = Mustache.render(xmlFulfillmentTemplate, templateProps)
+
+  fs.writeFileSync(xmlFulfillmentPath, normalizeXml(xmlFulfillment))
+
+  execSync(
+    `ffasn1dump -I xer -O der ${asnPath} Fulfillment ` +
+    `${xmlFulfillmentPath} ${derFulfillmentPath}`
+  )
+
+  const fulfillmentData = fs.readFileSync(derFulfillmentPath)
+  testData.fulfillment = fulfillmentData.toString('hex').toUpperCase()
+
+  // Generate condition
+  const uriConditionPath = path.resolve(uriPath, `condition_${type}.txt`)
+  const xmlSrcConditionPath = path.resolve(xmlPath, `condition_${type}.xml`)
+  const xmlDstConditionPath = path.resolve(distPath, `${suite}_${testName}_condition.xml`)
+  const derConditionPath = path.resolve(distPath, `${suite}_${testName}_condition.der`)
+  const fingerprint = crypto
+    .createHash('sha256')
+    .update(Buffer.from(testData.fingerprintContents, 'hex'))
+    .digest()
+
+  const fingerprintHex = formattedHex(fingerprint)
+
+  let subtypesBitarrayString = ''
+  if (testCaseDefinition.subtypes) {
+    const subtypeBits = testCaseDefinition.subtypes.map(x => SUBTYPES_BITS[x])
+    const largestBit = subtypeBits.reduce((a, b) => Math.max(a, b), 0)
+    const subtypesBitarray = new Array(largestBit).fill(0)
+    for (let subtypeBit of subtypeBits) {
+      subtypesBitarray[subtypeBit] = 1
+    }
+    subtypesBitarrayString = subtypesBitarray.join('')
+  }
+
+  templateProps.fingerprint = formattedHex(fingerprint)
+  templateProps.subtypes = subtypesBitarrayString
+
+  const srcConditionXmlData = fs.readFileSync(xmlSrcConditionPath, 'utf-8')
+  const dstConditionXmlData = Mustache.render(srcConditionXmlData, templateProps)
+
+  const srcConditionUriData = fs.readFileSync(uriConditionPath, 'utf-8')
+  const dstConditionUriData = srcConditionUriData
+    .replace('{{fingerprint}}', base64url(fingerprint))
+    .replace('{{cost}}', testCaseDefinition.cost)
+    .replace('{{subtypes}}', (testCaseDefinition.subtypes || []).join(','))
+    .replace(/\n$/, '')
+
+  fs.writeFileSync(xmlDstConditionPath, dstConditionXmlData)
+
+  execSync(
+    `ffasn1dump -I xer -O der ${asnPath} Condition ` +
+    `${xmlDstConditionPath} ${derConditionPath}`
+  )
+
+  const conditionData = fs.readFileSync(derConditionPath)
+  testData.conditionBinary = conditionData.toString('hex').toUpperCase()
+  testData.conditionUri = dstConditionUriData
+
+  fs.writeFileSync(testOutputPath, JSON.stringify(testData, null, 2))
 }

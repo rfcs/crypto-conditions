@@ -1,6 +1,5 @@
 {
   "type": "ed25519-sha-256",
-  "publicKey": "11qYAYKxCrfVS_7TyWQHOg7hcvPapiMlrwIaaPcHURo",
-  "signature": "5VZDAMNgrHKQhuLMgG6CioSHfx645dl02HPgZSJJAVVfuIIVkKM7rMYeOXAc-bRr0lv18FlbviRlUUFDjnoQCw",
+  "privateKey": "nWGxne_9WmC6hEr0kuwsxERJxWl7MmkZcDusAxyuf2A",
   "message": ""
 }

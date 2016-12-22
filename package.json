@@ -29,6 +29,8 @@
   },
   "homepage": "https://github.com/interledger/crypto-conditions#readme",
   "devDependencies": {
+    "base64url": "^2.0.0",
+    "ed25519": "0.0.4",
     "lodash": "^4.17.2",
     "mustache": "^2.3.0",
     "xmldoc": "^0.5.1"
