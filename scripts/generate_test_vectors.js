@@ -13,6 +13,7 @@ const uniq = require('lodash/uniq')
 const flatten = require('lodash/flatten')
 
 const ed25519 = require('../src/lib/ed25519')
+const rsa = require('../src/lib/rsa')
 
 const jsonPath = path.resolve(__dirname, '../src/json')
 const jsonSuites = fs.readdirSync(jsonPath)
@@ -79,9 +80,14 @@ const hydrateTestCaseDefinition = (testCaseDefinitionJson) => {
       testCaseDefinition.subconditionsAll.length * 1024
     testCaseDefinition.subtypes = uniq(flatten(testCaseDefinition.subconditionsAll.map(getSubtypesForCase)))
   } else if (testCaseDefinitionJson.type === 'rsa-sha-256') {
-    testCaseDefinition.modulus = Buffer.from(testCaseDefinitionJson.modulus, 'base64')
-    testCaseDefinition.signature = Buffer.from(testCaseDefinitionJson.signature, 'base64')
+    testCaseDefinition.modulus = rsa.getModulus(testCaseDefinition.privateKey)
     testCaseDefinition.message = Buffer.from(testCaseDefinitionJson.message, 'base64')
+    testCaseDefinition.salt = Buffer.from(testCaseDefinitionJson.salt, 'base64')
+    testCaseDefinition.signature = rsa.sign(
+      testCaseDefinition.message,
+      testCaseDefinition.privateKey,
+      testCaseDefinition.salt
+    )
     testCaseDefinition.cost = square(testCaseDefinition.modulus.length)
   } else if (testCaseDefinitionJson.type === 'ed25519-sha-256') {
     testCaseDefinition.privateKey = Buffer.from(testCaseDefinitionJson.privateKey, 'base64')
