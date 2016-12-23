@@ -53,16 +53,8 @@ BEGIN
   }
 
   ThresholdFulfillment ::= SEQUENCE {
-    -- We choose sequence-of instead of set-of, because a correct DER decoder
-    -- should reject set-of values that aren't in canonical order, but most
-    -- don't, so we'd risk inconsistent behavior.
-    --
-    -- By using sequence-of, we ensure that all implementations consistently
-    -- accept any arbitrary ordering.
-    --
-    -- The threshold equals the number of provided subfulfillments.
-    subfulfillments SEQUENCE OF Fulfillment,
-    subconditions SEQUENCE OF Condition
+    subfulfillments SET OF Fulfillment,
+    subconditions SET OF Condition
   }
 
   RsaFulfillment ::= SEQUENCE {
