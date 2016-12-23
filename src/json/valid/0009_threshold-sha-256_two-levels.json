@@ -1,0 +1,10 @@
+{
+  "type": "threshold-sha-256",
+  "threshold": 1,
+  "subfulfillments": [
+    "0007_threshold-sha-256_1-of-2"
+  ],
+  "subconditions": [
+    "0005_rsa-sha-256_2048"
+  ]
+}

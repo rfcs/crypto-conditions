@@ -1,0 +1,8 @@
+{
+  "type": "threshold-sha-256",
+  "threshold": 2,
+  "subfulfillments": [
+    "0005_rsa-sha-256_2048",
+    "0004_preimage-sha-256_small"
+  ]
+}
