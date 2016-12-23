@@ -76,9 +76,9 @@ const hydrateTestCaseDefinition = (testCaseDefinitionJson) => {
     testCaseDefinition.subconditionsAll = testCaseDefinition.subconditions
       .concat(testCaseDefinition.subfulfillments)
     testCaseDefinition.cost =
-      sum(getNLargest(testCaseDefinition.threshold, testCaseDefinition.subconditions.map(getCostForCase))) +
+      sum(getNLargest(testCaseDefinition.threshold, testCaseDefinition.subconditionsAll.map(getCostForCase))) +
       testCaseDefinition.subconditionsAll.length * 1024
-    testCaseDefinition.subtypes = uniq(flatten(testCaseDefinition.subconditionsAll.map(getSubtypesForCase)))
+    testCaseDefinition.subtypes = uniq(flatten(testCaseDefinition.subconditionsAll.map(getSubtypesForCase))).sort()
   } else if (testCaseDefinitionJson.type === 'rsa-sha-256') {
     testCaseDefinition.modulus = rsa.getModulus(testCaseDefinition.privateKey)
     testCaseDefinition.message = Buffer.from(testCaseDefinitionJson.message, 'base64')
@@ -111,7 +111,7 @@ const getCostForCase = testCase => getDataForCase(testCase).cost
 const getSubtypesForCase = testCase => {
   const testData = getDataForCase(testCase)
   const subtypes = uniq(testData.subtypes.concat([testData.json.type]))
-  return subtypes
+  return subtypes.sort()
 }
 
 const getTestData = (testCaseDefinition) => {
