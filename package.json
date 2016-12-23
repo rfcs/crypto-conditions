@@ -4,6 +4,7 @@
   "description": "Crypto-conditions spec and tests",
   "main": "index.js",
   "scripts": {
+    "build": "rm -f test-vectors/valid/*; node scripts/generate_test_vectors.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
@@ -39,6 +40,7 @@
     "mustache": "^2.3.0",
     "node-rsa": "^0.4.2",
     "sinon": "^1.17.6",
+    "tmp": "0.0.31",
     "xmldoc": "^0.5.1"
   }
 }
