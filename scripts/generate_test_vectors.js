@@ -37,7 +37,7 @@ const hydrateTestCaseDefinition = (testCaseDefinitionJson) => {
       1024
     testCaseDefinition.subtypes = getSubtypesForCase(testCaseDefinition.subcondition)
   } else if (testCaseDefinitionJson.type === 'threshold-sha-256') {
-    testCaseDefinition.threshold = testCaseDefinitionJson.threshold
+    testCaseDefinition.threshold = testCaseDefinitionJson.subfulfillments.length
     testCaseDefinition.subconditions = testCaseDefinitionJson.subconditions || []
     testCaseDefinition.subconditionsAll = testCaseDefinition.subconditions
       .concat(testCaseDefinition.subfulfillments)
