@@ -1,6 +1,0 @@
-{
-  "type": "threshold-sha-256",
-  "subfulfillments": [
-    "0001_preimage-sha-256_empty"
-  ]
-}

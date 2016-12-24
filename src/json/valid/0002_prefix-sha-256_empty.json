@@ -1,6 +1,0 @@
-{
-  "type": "prefix-sha-256",
-  "prefix": "",
-  "maxMessageLength": 0,
-  "subcondition": "0001_preimage-sha-256_empty"
-}

@@ -1,14 +1,12 @@
 'use strict'
 
-const path = require('path')
-
 const uniq = require('lodash/uniq')
 const flatten = require('lodash/flatten')
 
 const ed25519 = require('./ed25519')
 const rsa = require('./rsa')
-
-const outputPath = path.resolve(__dirname, '../../test-vectors')
+const serializer = require('./serializer')
+const output = require('./output')
 
 const sum = arr => arr.reduce((a, b) => a + b, 0)
 const square = a => a * a
@@ -24,6 +22,7 @@ const hydrateTestCaseDefinition = (testCaseDefinitionJson) => {
     testCaseDefinition.cost = testCaseDefinition.preimage.length
   } else if (testCaseDefinitionJson.type === 'prefix-sha-256') {
     testCaseDefinition.prefix = Buffer.from(testCaseDefinitionJson.prefix, 'base64')
+    testCaseDefinition.subcondition = hydrateTestCaseDefinition(testCaseDefinition.subcondition)
     testCaseDefinition.cost =
       testCaseDefinition.prefix.length +
       testCaseDefinition.maxMessageLength +
@@ -32,7 +31,12 @@ const hydrateTestCaseDefinition = (testCaseDefinitionJson) => {
     testCaseDefinition.subtypes = getSubtypesForCase(testCaseDefinition.subcondition)
   } else if (testCaseDefinitionJson.type === 'threshold-sha-256') {
     testCaseDefinition.threshold = testCaseDefinitionJson.subfulfillments.length
-    testCaseDefinition.subconditions = testCaseDefinitionJson.subconditions || []
+    testCaseDefinition.subfulfillments = testCaseDefinition.subfulfillments.map(hydrateTestCaseDefinition)
+    if (testCaseDefinitionJson.subconditions) {
+      testCaseDefinition.subconditions = testCaseDefinition.subconditions.map(hydrateTestCaseDefinition)
+    } else {
+      testCaseDefinition.subconditions = []
+    }
     testCaseDefinition.subconditionsAll = testCaseDefinition.subconditions
       .concat(testCaseDefinition.subfulfillments)
     testCaseDefinition.cost =
@@ -57,16 +61,18 @@ const hydrateTestCaseDefinition = (testCaseDefinitionJson) => {
     testCaseDefinition.cost = 131072
   }
 
+  testCaseDefinition.serial = serializer.getAll(testCaseDefinition)
+
   return testCaseDefinition
 }
 
 const getDataForCase = (testCase) => {
-  const outputJsonPath = path.resolve(outputPath, `valid/${testCase}.json`)
-  const outputJson = require(outputJsonPath)
-  return outputJson
+  const testCaseDefinition = hydrateTestCaseDefinition(testCase)
+  return output.generateTestVectorJson(testCaseDefinition)
 }
 
-const getJsonForCase = testCase => getDataForCase(testCase).json
+const getJsonForCase =
+exports.getJsonForCase = testCase => getDataForCase(testCase).json
 const getCostForCase = testCase => getDataForCase(testCase).cost
 const getSubtypesForCase = testCase => {
   const testData = getDataForCase(testCase)

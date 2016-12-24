@@ -37,15 +37,15 @@ const generateFulfillmentDefinitionJson = (testCaseDefinition) => {
     }
   }
 }
-const generateTestVectorJson = (testCaseDefinition, serial) => {
+const generateTestVectorJson = (testCaseDefinition) => {
   return {
     json: generateFulfillmentDefinitionJson(testCaseDefinition),
     cost: testCaseDefinition.cost,
     subtypes: testCaseDefinition.subtypes,
-    fingerprintContents: serial.fingerprint.der.toString('hex').toUpperCase(),
-    fulfillment: serial.fulfillment.der.toString('hex').toUpperCase(),
-    conditionBinary: serial.condition.der.toString('hex').toUpperCase(),
-    conditionUri: serial.condition.uri
+    fingerprintContents: testCaseDefinition.serial.fingerprint.der.toString('hex').toUpperCase(),
+    fulfillment: testCaseDefinition.serial.fulfillment.der.toString('hex').toUpperCase(),
+    conditionBinary: testCaseDefinition.serial.condition.der.toString('hex').toUpperCase(),
+    conditionUri: testCaseDefinition.serial.condition.uri
   }
 }
 

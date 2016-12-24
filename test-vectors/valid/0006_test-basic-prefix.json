@@ -1,0 +1,19 @@
+{
+  "json": {
+    "type": "prefix-sha-256",
+    "maxMessageLength": 0,
+    "prefix": "YWFh",
+    "subfulfillment": {
+      "type": "preimage-sha-256",
+      "preimage": "YWFh"
+    }
+  },
+  "cost": 1030,
+  "subtypes": [
+    "preimage-sha-256"
+  ],
+  "fingerprintContents": "30318003616161810100A227A02580209834876DCFB05CB167A5C24953EBA58C4AC89B1ADF57F28F2F9D09AF107EE8F0810103",
+  "fulfillment": "A1118003616161810100A207A0058003616161",
+  "conditionBinary": "A12A80205E576A9FED75DE04FC25F326BCE6BF4851BD7D7537F3FD7933778EE3AA79E7378102040682020780",
+  "conditionUri": "ni:sha-256;Xldqn-113gT8JfMmvOa_SFG9fXU38_15M3eO46p55zc?fpt=prefix-sha-256&cost=1030&subtypes=preimage-sha-256"
+}

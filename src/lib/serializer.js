@@ -11,7 +11,6 @@ const ffasn1dump = require('../lib/ffasn1dump')
 
 const xmlPath = path.resolve(__dirname, '../xer')
 const uriPath = path.resolve(__dirname, '../uri')
-const distPath = path.resolve(__dirname, '../../dist')
 
 const FINGERPRINT_ASN_TYPES = {
   // Preimage doesn't have an ASN-encoded fingerprint. The fingerprint contents
@@ -42,12 +41,8 @@ const formattedHex = (buffer) => {
     .join(' ')
 }
 
-const getXml = (testCase, type) => {
-  const xmlPath = path.resolve(distPath, `valid_${testCase}_${type}.xml`)
-  const xml = fs.readFileSync(xmlPath, 'utf-8')
-  const xmlDoc = new xmldoc.XmlDocument(xml)
-
-  return xmlDoc.firstChild.toString()
+const getFirstChild = (xmlString) => {
+  return new xmldoc.XmlDocument(xmlString).firstChild.toString()
 }
 
 const getTemplateProps = (test) => {
@@ -60,16 +55,16 @@ const getTemplateProps = (test) => {
     return {
       prefix: formattedHex(test.prefix),
       maxMessageLength: test.maxMessageLength,
-      subcondition: getXml(test.subcondition, 'condition'),
-      subfulfillment: getXml(test.subcondition, 'fulfillment'),
+      subcondition: getFirstChild(test.subcondition.serial.condition.xml),
+      subfulfillment: getFirstChild(test.subcondition.serial.fulfillment.xml),
       cost: test.cost
     }
   } else if (test.type === 'threshold-sha-256') {
     return {
+      subconditionsAll: test.subconditionsAll.map(x => getFirstChild(x.serial.condition.xml)),
+      subconditions: test.subconditions.map(x => getFirstChild(x.serial.condition.xml)),
+      subfulfillments: test.subfulfillments.map(x => getFirstChild(x.serial.fulfillment.xml)),
       threshold: test.threshold,
-      subconditionsAll: test.subconditionsAll.map(x => getXml(x, 'condition')),
-      subconditions: test.subconditions.map(x => getXml(x, 'condition')),
-      subfulfillments: test.subfulfillments.map(x => getXml(x, 'fulfillment')),
       cost: test.cost
     }
   } else if (test.type === 'rsa-sha-256') {
