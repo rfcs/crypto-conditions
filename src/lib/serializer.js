@@ -50,53 +50,60 @@ const getXml = (testCase, type) => {
   return xmlDoc.firstChild.toString()
 }
 
-const getTemplateProps = (testCaseDefinition) => {
-  if (testCaseDefinition.type === 'preimage-sha-256') {
+const getTemplateProps = (test) => {
+  if (test.type === 'preimage-sha-256') {
     return {
-      preimage: formattedHex(testCaseDefinition.preimage),
-      cost: testCaseDefinition.cost
+      preimage: formattedHex(test.preimage),
+      cost: test.cost
     }
-  } else if (testCaseDefinition.type === 'prefix-sha-256') {
+  } else if (test.type === 'prefix-sha-256') {
     return {
-      prefix: formattedHex(testCaseDefinition.prefix),
-      maxMessageLength: testCaseDefinition.maxMessageLength,
-      subcondition: getXml(testCaseDefinition.subcondition, 'condition'),
-      subfulfillment: getXml(testCaseDefinition.subcondition, 'fulfillment'),
-      cost: testCaseDefinition.cost
+      prefix: formattedHex(test.prefix),
+      maxMessageLength: test.maxMessageLength,
+      subcondition: getXml(test.subcondition, 'condition'),
+      subfulfillment: getXml(test.subcondition, 'fulfillment'),
+      cost: test.cost
     }
-  } else if (testCaseDefinition.type === 'threshold-sha-256') {
+  } else if (test.type === 'threshold-sha-256') {
     return {
-      threshold: testCaseDefinition.threshold,
-      subconditionsAll: testCaseDefinition.subconditionsAll.map(x => getXml(x, 'condition')),
-      subconditions: testCaseDefinition.subconditions.map(x => getXml(x, 'condition')),
-      subfulfillments: testCaseDefinition.subfulfillments.map(x => getXml(x, 'fulfillment')),
-      cost: testCaseDefinition.cost
+      threshold: test.threshold,
+      subconditionsAll: test.subconditionsAll.map(x => getXml(x, 'condition')),
+      subconditions: test.subconditions.map(x => getXml(x, 'condition')),
+      subfulfillments: test.subfulfillments.map(x => getXml(x, 'fulfillment')),
+      cost: test.cost
     }
-  } else if (testCaseDefinition.type === 'rsa-sha-256') {
+  } else if (test.type === 'rsa-sha-256') {
     return {
-      modulus: formattedHex(testCaseDefinition.modulus),
-      signature: formattedHex(testCaseDefinition.signature),
-      cost: testCaseDefinition.cost
+      modulus: formattedHex(test.modulus),
+      signature: formattedHex(test.signature),
+      cost: test.cost
     }
-  } else if (testCaseDefinition.type === 'ed25519-sha-256') {
+  } else if (test.type === 'ed25519-sha-256') {
     return {
-      publicKey: formattedHex(testCaseDefinition.publicKey),
-      signature: formattedHex(testCaseDefinition.signature),
-      cost: testCaseDefinition.cost
+      publicKey: formattedHex(test.publicKey),
+      signature: formattedHex(test.signature),
+      cost: test.cost
     }
   }
 }
 
-const getFingerprint = (type, templateProps) => {
-  const xmlFingerprintTemplate = fs.readFileSync(path.resolve(xmlPath, `fingerprint_${type}.xml`), 'utf-8')
-  const xmlFingerprint = Mustache.render(xmlFingerprintTemplate, templateProps)
+const getFingerprint = (type, templateProps, preimage) => {
+  if (type === 'preimage-sha-256') {
+    return {
+      der: preimage,
+      xml: ''
+    }
+  } else {
+    const xmlFingerprintTemplate = fs.readFileSync(path.resolve(xmlPath, `fingerprint_${type}.xml`), 'utf-8')
+    const xmlFingerprint = Mustache.render(xmlFingerprintTemplate, templateProps)
 
-  const fingerprintAsnType = FINGERPRINT_ASN_TYPES[type]
-  const fingerprintData = ffasn1dump.xerToDer(xmlFingerprint, fingerprintAsnType)
+    const fingerprintAsnType = FINGERPRINT_ASN_TYPES[type]
+    const fingerprintData = ffasn1dump.xerToDer(xmlFingerprint, fingerprintAsnType)
 
-  return {
-    der: fingerprintData,
-    xml: normalizeXml(xmlFingerprint)
+    return {
+      der: fingerprintData,
+      xml: normalizeXml(xmlFingerprint)
+    }
   }
 }
 
@@ -153,9 +160,36 @@ const getCondition = (type, templateProps, fingerprintContents, subtypes, cost) 
   }
 }
 
+const getAll = (testCaseDefinition) => {
+  const templateProps = getTemplateProps(testCaseDefinition)
+  const fingerprint = getFingerprint(
+    testCaseDefinition.type,
+    templateProps,
+    testCaseDefinition.preimage
+  )
+  const fulfillment = getFulfillment(
+    testCaseDefinition.type,
+    templateProps
+  )
+  const condition = getCondition(
+    testCaseDefinition.type,
+    templateProps,
+    fingerprint.der,
+    testCaseDefinition.subtypes,
+    testCaseDefinition.cost
+  )
+
+  return {
+    fingerprint,
+    fulfillment,
+    condition
+  }
+}
+
 module.exports = {
   getTemplateProps,
   getFingerprint,
   getFulfillment,
-  getCondition
+  getCondition,
+  getAll
 }

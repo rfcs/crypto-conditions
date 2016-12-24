@@ -142,51 +142,32 @@ for (let testCase of fs.readdirSync(suitePath)) {
   const testPath = path.resolve(suitePath, testCase)
   const testOutputPath = path.resolve(outputPath, `${suite}/${testCase}`)
   const testCaseDefinition = hydrateTestCaseDefinition(require(testPath))
-  const type = testCase.split('_')[1]
 
   const testData = getTestData(testCaseDefinition)
-  const templateProps = serializer.getTemplateProps(testCaseDefinition)
 
-  // Generate fingerprint
-  if (type === 'preimage-sha-256') {
-    testData.fingerprintContents = testCaseDefinition.preimage.toString('hex').toUpperCase()
-  } else {
-    const xmlFingerprintPath = path.resolve(distPath, `${suite}_${testName}_fingerprint.xml`)
-    const derFingerprintPath = path.resolve(distPath, `${suite}_${testName}_fingerprint.der`)
-
-    const { xml: xmlFingerprint, der: fingerprintData } =
-      serializer.getFingerprint(type, templateProps)
-
-    fs.writeFileSync(xmlFingerprintPath, xmlFingerprint)
-    fs.writeFileSync(derFingerprintPath, fingerprintData)
-
-    testData.fingerprintContents = fingerprintData.toString('hex').toUpperCase()
-  }
-
-  // Generate fulfillment
+  const xmlFingerprintPath = path.resolve(distPath, `${suite}_${testName}_fingerprint.xml`)
+  const derFingerprintPath = path.resolve(distPath, `${suite}_${testName}_fingerprint.der`)
   const xmlFulfillmentPath = path.resolve(distPath, `${suite}_${testName}_fulfillment.xml`)
   const derFulfillmentPath = path.resolve(distPath, `${suite}_${testName}_fulfillment.der`)
-
-  const { xml: xmlFulfillment, der: fulfillmentData } =
-    serializer.getFulfillment(type, templateProps)
-
-  fs.writeFileSync(xmlFulfillmentPath, xmlFulfillment)
-  fs.writeFileSync(derFulfillmentPath, fulfillmentData)
-
-  testData.fulfillment = fulfillmentData.toString('hex').toUpperCase()
-
-  // Generate condition
   const xmlConditionPath = path.resolve(distPath, `${suite}_${testName}_condition.xml`)
   const derConditionPath = path.resolve(distPath, `${suite}_${testName}_condition.der`)
 
-  const { xml: xmlCondition, der: conditionData, uri: conditionUri } =
-    serializer.getCondition(type, templateProps, Buffer.from(testData.fingerprintContents, 'hex'), testCaseDefinition.subtypes, testCaseDefinition.cost)
+  const serial = serializer.getAll(testCaseDefinition)
 
-  fs.writeFileSync(xmlConditionPath, xmlCondition)
-  fs.writeFileSync(derConditionPath, conditionData)
+  // preimage-sha-256 has no fingerprint, so we may end up skipping this
+  if (serial.fingerprint.xml) {
+    fs.writeFileSync(xmlFingerprintPath, serial.fingerprint.xml)
+  }
+  fs.writeFileSync(derFingerprintPath, serial.fingerprint.der)
+  fs.writeFileSync(xmlFulfillmentPath, serial.fulfillment.xml)
+  fs.writeFileSync(derFulfillmentPath, serial.fulfillment.der)
+  fs.writeFileSync(xmlConditionPath, serial.condition.xml)
+  fs.writeFileSync(derConditionPath, serial.condition.der)
 
-  testData.conditionBinary = conditionData.toString('hex').toUpperCase()
-  testData.conditionUri = conditionUri
+  testData.fingerprintContents = serial.fingerprint.der.toString('hex').toUpperCase()
+  testData.fulfillment = serial.fulfillment.der.toString('hex').toUpperCase()
+  testData.conditionBinary = serial.condition.der.toString('hex').toUpperCase()
+  testData.conditionUri = serial.condition.uri
 
   fs.writeFileSync(testOutputPath, JSON.stringify(testData, null, 2))
 }
