@@ -31,6 +31,7 @@ const suite = 'valid'
 
 tests.forEach((test, i) => {
   const index = padStart(String(i), 4, '0')
+  console.log(`generating ${suite} test ${index}_${test.name}`)
   const testOutputPath = path.resolve(outputPath, `${suite}/${index}_${test.name}.json`)
   const xmlFingerprintPath = path.resolve(distPath, `${suite}_${index}_${test.name}_fingerprint.xml`)
   const derFingerprintPath = path.resolve(distPath, `${suite}_${index}_${test.name}_fingerprint.der`)

@@ -45,7 +45,8 @@ const generateTestVectorJson = (testCaseDefinition) => {
     fingerprintContents: testCaseDefinition.serial.fingerprint.der.toString('hex').toUpperCase(),
     fulfillment: testCaseDefinition.serial.fulfillment.der.toString('hex').toUpperCase(),
     conditionBinary: testCaseDefinition.serial.condition.der.toString('hex').toUpperCase(),
-    conditionUri: testCaseDefinition.serial.condition.uri
+    conditionUri: testCaseDefinition.serial.condition.uri,
+    message: testCaseDefinition.message.toString('hex').toUpperCase()
   }
 }
 

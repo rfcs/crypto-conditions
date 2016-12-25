@@ -12,63 +12,77 @@ const sum = arr => arr.reduce((a, b) => a + b, 0)
 const square = a => a * a
 const getNLargest = (n, arr) => arr.sort((a, b) => b - a).slice(0, n)
 
-const hydrateTestCaseDefinition = (testCaseDefinitionJson) => {
-  const testCaseDefinition = Object.assign({}, testCaseDefinitionJson)
+const hydrateWithMessage = (message) => {
+  return (testCaseDefinitionJson) => hydrateTestCaseDefinition(
+    testCaseDefinitionJson,
+    message
+  )
+}
 
-  testCaseDefinition.subtypes = []
+const hydrateTestCaseDefinition = (testCaseDefinitionJson, message = null) => {
+  // Test Case Definition
+  const tcd = Object.assign({}, testCaseDefinitionJson)
 
-  if (testCaseDefinitionJson.type === 'preimage-sha-256') {
-    testCaseDefinition.preimage = Buffer.from(testCaseDefinitionJson.preimage, 'base64')
-    testCaseDefinition.cost = testCaseDefinition.preimage.length
-  } else if (testCaseDefinitionJson.type === 'prefix-sha-256') {
-    testCaseDefinition.prefix = Buffer.from(testCaseDefinitionJson.prefix, 'base64')
-    testCaseDefinition.subcondition = hydrateTestCaseDefinition(testCaseDefinition.subcondition)
-    testCaseDefinition.cost =
-      testCaseDefinition.prefix.length +
-      testCaseDefinition.maxMessageLength +
-      getCostForCase(testCaseDefinition.subcondition) +
-      1024
-    testCaseDefinition.subtypes = getSubtypesForCase(testCaseDefinition.subcondition)
-  } else if (testCaseDefinitionJson.type === 'threshold-sha-256') {
-    testCaseDefinition.threshold = testCaseDefinitionJson.subfulfillments.length
-    testCaseDefinition.subfulfillments = testCaseDefinition.subfulfillments.map(hydrateTestCaseDefinition)
-    if (testCaseDefinitionJson.subconditions) {
-      testCaseDefinition.subconditions = testCaseDefinition.subconditions.map(hydrateTestCaseDefinition)
-    } else {
-      testCaseDefinition.subconditions = []
-    }
-    testCaseDefinition.subconditionsAll = testCaseDefinition.subconditions
-      .concat(testCaseDefinition.subfulfillments)
-    testCaseDefinition.cost =
-      sum(getNLargest(testCaseDefinition.threshold, testCaseDefinition.subconditionsAll.map(getCostForCase))) +
-      testCaseDefinition.subconditionsAll.length * 1024
-    testCaseDefinition.subtypes = uniq(flatten(testCaseDefinition.subconditionsAll.map(getSubtypesForCase))).sort()
-  } else if (testCaseDefinitionJson.type === 'rsa-sha-256') {
-    testCaseDefinition.modulus = rsa.getModulus(testCaseDefinition.privateKey)
-    testCaseDefinition.message = Buffer.from(testCaseDefinitionJson.message, 'base64')
-    testCaseDefinition.salt = Buffer.from(testCaseDefinitionJson.salt, 'base64')
-    testCaseDefinition.signature = rsa.sign(
-      testCaseDefinition.message,
-      testCaseDefinition.privateKey,
-      testCaseDefinition.salt
-    )
-    testCaseDefinition.cost = square(testCaseDefinition.modulus.length)
-  } else if (testCaseDefinitionJson.type === 'ed25519-sha-256') {
-    testCaseDefinition.privateKey = Buffer.from(testCaseDefinitionJson.privateKey, 'base64')
-    testCaseDefinition.publicKey = ed25519.getPublicKey(testCaseDefinition.privateKey)
-    testCaseDefinition.message = Buffer.from(testCaseDefinitionJson.message, 'base64')
-    testCaseDefinition.signature = ed25519.sign(testCaseDefinition.message, testCaseDefinition.privateKey)
-    testCaseDefinition.cost = 131072
+  tcd.subtypes = []
+  if (message) {
+    tcd.message = message
+  } else if (tcd.message) {
+    tcd.message = Buffer.from(testCaseDefinitionJson.message, 'base64')
+  } else {
+    tcd.message = Buffer.alloc(0)
   }
 
-  testCaseDefinition.serial = serializer.getAll(testCaseDefinition)
+  if (testCaseDefinitionJson.type === 'preimage-sha-256') {
+    tcd.preimage = Buffer.from(testCaseDefinitionJson.preimage, 'base64')
+    tcd.cost = tcd.preimage.length
+  } else if (testCaseDefinitionJson.type === 'prefix-sha-256') {
+    tcd.prefix = Buffer.from(testCaseDefinitionJson.prefix, 'base64')
+    const hydrate = hydrateWithMessage(Buffer.concat([tcd.prefix, tcd.message]))
+    tcd.subcondition = hydrate(tcd.subcondition)
+    tcd.cost =
+      tcd.prefix.length +
+      tcd.maxMessageLength +
+      getCostForCase(tcd.subcondition) +
+      1024
+    tcd.subtypes = getSubtypesForCase(tcd.subcondition)
+  } else if (testCaseDefinitionJson.type === 'threshold-sha-256') {
+    const hydrate = hydrateWithMessage(tcd.message)
+    tcd.threshold = testCaseDefinitionJson.subfulfillments.length
+    tcd.subfulfillments = tcd.subfulfillments.map(hydrate)
+    if (testCaseDefinitionJson.subconditions) {
+      tcd.subconditions = tcd.subconditions.map(hydrate)
+    } else {
+      tcd.subconditions = []
+    }
+    tcd.subconditionsAll = tcd.subconditions.concat(tcd.subfulfillments)
+    tcd.cost =
+      sum(getNLargest(tcd.threshold, tcd.subconditionsAll.map(getCostForCase))) +
+      tcd.subconditionsAll.length * 1024
+    tcd.subtypes = uniq(flatten(tcd.subconditionsAll.map(getSubtypesForCase))).sort()
+  } else if (testCaseDefinitionJson.type === 'rsa-sha-256') {
+    tcd.modulus = rsa.getModulus(tcd.privateKey)
+    tcd.salt = Buffer.from(testCaseDefinitionJson.salt, 'base64')
+    tcd.signature = rsa.sign(
+      tcd.message,
+      tcd.privateKey,
+      tcd.salt
+    )
+    tcd.cost = square(tcd.modulus.length)
+  } else if (testCaseDefinitionJson.type === 'ed25519-sha-256') {
+    tcd.privateKey = Buffer.from(testCaseDefinitionJson.privateKey, 'base64')
+    tcd.publicKey = ed25519.getPublicKey(tcd.privateKey)
+    tcd.signature = ed25519.sign(tcd.message, tcd.privateKey)
+    tcd.cost = 131072
+  }
 
-  return testCaseDefinition
+  tcd.serial = serializer.getAll(tcd)
+
+  return tcd
 }
 
 const getDataForCase = (testCase) => {
-  const testCaseDefinition = hydrateTestCaseDefinition(testCase)
-  return output.generateTestVectorJson(testCaseDefinition)
+  const tcd = hydrateTestCaseDefinition(testCase)
+  return output.generateTestVectorJson(tcd)
 }
 
 const getJsonForCase =
