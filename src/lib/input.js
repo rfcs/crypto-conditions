@@ -45,6 +45,7 @@ const hydrateTestCaseDefinition = (testCaseDefinitionJson, message = null) => {
       getCostForCase(tcd.subcondition) +
       1024
     tcd.subtypes = getSubtypesForCase(tcd.subcondition)
+      .filter(x => x !== tcd.type)
   } else if (testCaseDefinitionJson.type === 'threshold-sha-256') {
     const hydrate = hydrateWithMessage(tcd.message)
     tcd.threshold = testCaseDefinitionJson.subfulfillments.length
@@ -58,7 +59,9 @@ const hydrateTestCaseDefinition = (testCaseDefinitionJson, message = null) => {
     tcd.cost =
       sum(getNLargest(tcd.threshold, tcd.subconditionsAll.map(getCostForCase))) +
       tcd.subconditionsAll.length * 1024
-    tcd.subtypes = uniq(flatten(tcd.subconditionsAll.map(getSubtypesForCase))).sort()
+    tcd.subtypes = uniq(flatten(tcd.subconditionsAll.map(getSubtypesForCase)))
+      .filter(x => x !== tcd.type)
+      .sort()
   } else if (testCaseDefinitionJson.type === 'rsa-sha-256') {
     tcd.modulus = rsa.getModulus(tcd.privateKey)
     tcd.salt = Buffer.from(testCaseDefinitionJson.salt, 'base64')
