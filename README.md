@@ -41,3 +41,7 @@ Note that we don't provide any test cases for fulfillments that are valid, but d
 ## Test Vectors Source
 
 The test vectors themselves are generated from example data in the `src/test-vectors/` folder. You should never have to worry about that unless you are adding or editing test vectors.
+
+## Generating Tests
+
+The ffasn1dump tool is used to produce DER encodings. It is available from http://bellard.org/ffasn1
