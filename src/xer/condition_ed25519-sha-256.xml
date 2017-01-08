@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Condition>
-  <ed25519Sha256Condition>
+  <ed25519Sha256>
     <fingerprint>
       {{fingerprint}}
     </fingerprint>
     <cost>{{cost}}</cost>
-  </ed25519Sha256Condition>
+  </ed25519Sha256>
 </Condition>

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Fulfillment>
-  <thresholdSha256Fulfillment>
+  <thresholdSha256>
     <subfulfillments>
     {{#subfulfillments}}
       {{.}}
@@ -11,5 +11,5 @@
         {{.}}
       {{/subconditions}}
     </subconditions>
-  </thresholdSha256Fulfillment>
+  </thresholdSha256>
 </Fulfillment>

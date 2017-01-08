@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Condition>
-  <prefixSha256Condition>
+  <prefixSha256>
     <fingerprint>
       {{fingerprint}}
     </fingerprint>
     <cost>{{cost}}</cost>
     <subtypes>{{subtypes}}</subtypes>
-  </prefixSha256Condition>
+  </prefixSha256>
 </Condition>
