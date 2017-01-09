@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Fulfillment>
-  <preimageSha256Fulfillment>
+  <preimageSha256>
     <preimage>{{preimage}}</preimage>
-  </preimageSha256Fulfillment>
+  </preimageSha256>
 </Fulfillment>

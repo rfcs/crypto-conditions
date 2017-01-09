@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Fulfillment>
-  <rsaSha256Fulfillment>
+  <rsaSha256>
     <modulus>
       {{modulus}}
     </modulus>
     <signature>
       {{signature}}
     </signature>
-  </rsaSha256Fulfillment>
+  </rsaSha256>
 </Fulfillment>

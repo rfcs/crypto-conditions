@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Fulfillment>
-  <prefixSha256Fulfillment>
+  <prefixSha256>
     <prefix>{{prefix}}</prefix>
     <maxMessageLength>{{maxMessageLength}}</maxMessageLength>
     <subfulfillment>
       {{subfulfillment}}
     </subfulfillment>
-  </prefixSha256Fulfillment>
+  </prefixSha256>
 </Fulfillment>

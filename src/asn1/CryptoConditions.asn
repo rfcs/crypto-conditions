@@ -1,234 +1,93 @@
-Crypto-Conditions DEFINITIONS AUTOMATIC TAGS ::=
-BEGIN
+--<ASN1.PDU Crypto-Conditions.Condition, Crypto-Conditions.Fulfillment>--
 
-  -- Core Structures
+Crypto-Conditions DEFINITIONS AUTOMATIC TAGS ::= BEGIN
 
-  Crypto-Condition ::= Condition
+    -- Conditions
 
-  Crypto-Fulfillment ::= Fulfillment
-
-  Condition ::= CHOICE {
-    preimageSha256Condition     [0] Simple256Condition,
-    prefixSha256Condition       [1] Compound256Condition,
-    thresholdSha256Condition    [2] Compound256Condition,
-    rsaSha256Condition          [3] Simple256Condition,
-    ed25519Sha256Condition      [4] Simple256Condition
-  }
-
-  Simple256Condition ::= SEQUENCE {
-    fingerprint OCTET STRING (SIZE(32)),
-    cost INTEGER (0..4294967295)
-  }
-
-  Compound256Condition ::= SEQUENCE {
-    fingerprint OCTET STRING (SIZE(32)),
-    cost INTEGER (0..4294967295),
-    subtypes ConditionTypes
-  }
-
-  ConditionTypes ::= BIT STRING {
-    preimageSha256  (0),
-    prefixSha256    (1),
-    thresholdSha256 (2),
-    rsaSha256       (3),
-    ed25519Sha256   (4)
-  }
-
-  Fulfillment ::= CHOICE {
-    preimageSha256Fulfillment   [0] PreimageFulfillment ,
-    prefixSha256Fulfillment     [1] PrefixFulfillment,
-    thresholdSha256Fulfillment  [2] ThresholdFulfillment,
-    rsaSha256Fulfillment        [3] RsaFulfillment,
-    ed25519Sha256Fulfillment    [4] Ed25519Fulfillment
-  }
-
-  PreimageFulfillment ::= SEQUENCE {
-    preimage OCTET STRING
-  }
-
-  PrefixFulfillment ::= SEQUENCE {
-    prefix OCTET STRING,
-    maxMessageLength INTEGER (0..4294967295),
-    subfulfillment Fulfillment
-  }
-
-  ThresholdFulfillment ::= SEQUENCE {
-    subfulfillments SET OF Fulfillment,
-    subconditions SET OF Condition
-  }
-
-  RsaFulfillment ::= SEQUENCE {
-    modulus OCTET STRING,
-    signature OCTET STRING
-  }
-
-  Ed25519Fulfillment ::= SEQUENCE {
-    publicKey OCTET STRING (SIZE(32)),
-    signature OCTET STRING (SIZE(64))
-  }
-
-
-  /**
-   * FINGERPRINT CONTENTS
-   *
-   * The content that will be hashed to arrive at the fingerprint.
-   */
-
-  -- The PreimageSha256 fingerprint is the SHA256 hash of the raw preimage
-
-  PrefixFingerprintContents ::= SEQUENCE {
-    prefix OCTET STRING,
-    maxMessageLength INTEGER (0..4294967295),
-    subcondition Condition
-  }
-
-  ThresholdFingerprintContents ::= SEQUENCE {
-    threshold INTEGER (1..65535),
-    -- This set must be canonically ordered according to DER as defined in
-    -- section 11.6 of ISO/IEC 8825-1:2015.
-    subconditions SET OF Condition
-  }
-
-  RsaFingerprintContents ::= SEQUENCE {
-    modulus OCTET STRING
-  }
-
-  Ed25519FingerprintContents ::= SEQUENCE {
-    publicKey OCTET STRING (SIZE(32))
-  }
-
-
-  /**
-   * EXAMPLES
-   */
-
-  examplePreimageCondition Condition ::=
-    preimageSha256Condition : {
-      fingerprint '7F83B165 7FF1FC53 B92DC181 48A1D65D FC2D4B1F A3D67728 4ADDD200 126D9069'H,
-      cost 12
+    Condition ::= CHOICE {
+      preimageSha256   [0] SimpleSha256Condition,
+      prefixSha256     [1] CompoundSha256Condition,
+      thresholdSha256  [2] CompoundSha256Condition,
+      rsaSha256        [3] SimpleSha256Condition,
+      ed25519Sha256    [4] SimpleSha256Condition
     }
 
-  examplePreimageFulfillment Fulfillment ::=
-    preimageSha256Fulfillment : { preimage '48 65 6C 6C 6F 20 57 6F 72 6C 64 21'H }
-
-  examplePrefixCondition Condition ::=
-    prefixSha256Condition : {
-      fingerprint 'BB1AC5260C0141B7E54B26EC2330637C5597BF811951AC09E744AD20FF77E287'H,
-      cost 1024,
-      subtypes { preimageSha256 }
+    SimpleSha256Condition ::= SEQUENCE {
+      fingerprint          OCTET STRING (SIZE(32)),
+      cost                 INTEGER (0..4294967295)
     }
 
-  examplePrefixFulfillment Fulfillment ::=
-    prefixSha256Fulfillment : {
-      prefix ''H,
-      maxMessageLength 0,
-      subfulfillment preimageSha256Fulfillment : { preimage ''H }
+    CompoundSha256Condition ::= SEQUENCE {
+      fingerprint          OCTET STRING (SIZE(32)),
+      cost                 INTEGER (0..4294967295),
+      subtypes             ConditionTypes
     }
 
-  examplePrefixFingerprintContents PrefixFingerprintContents ::= {
-    prefix ''H,
-    maxMessageLength 0,
-    subcondition preimageSha256Condition : {
-      fingerprint 'E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855'H,
-      cost 0
+    ConditionTypes ::= BIT STRING {
+      preImageSha256   (0),
+      prefixSha256     (1),
+      thresholdSha256  (2),
+      rsaSha256        (3),
+      ed25519Sha256    (4)
     }
-  }
+    
+    -- Fulfillments
 
-  exampleThresholdCondition Condition ::=
-    thresholdSha256Condition : {
-      fingerprint 'B4B84136DF48A71D73F4985C04C6767A778ECB65BA7023B4506823BEEE7631B9'H,
-      cost 1024,
-      subtypes { preimageSha256 }
-    }
-
-  exampleThresholdFulfillment Fulfillment ::=
-    thresholdSha256Fulfillment : {
-      subfulfillments { preimageSha256Fulfillment : { preimage ''H } },
-      subconditions { }
+    Fulfillment ::= CHOICE {
+      preimageSha256   [0] PreimageFulfillment ,
+      prefixSha256     [1] PrefixFulfillment,
+      thresholdSha256  [2] ThresholdFulfillment,
+      rsaSha256        [3] RsaSha256Fulfillment,
+      ed25519Sha256    [4] Ed25519Sha512Fulfillment
     }
 
-  exampleThresholdFingerprintContents ThresholdFingerprintContents ::= {
-    threshold 1,
-    subconditions {
-      preimageSha256Condition : {
-        fingerprint 'E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855'H,
-        cost 0
-      }
-    }
-  }
-
-  exampleThresholdCondition2 Condition ::=
-    thresholdSha256Condition : {
-      fingerprint '5A218ECE7AC4BC77157F04CB4BC8DFCD5C9D225A55BD0AA760BCA2A4F1773DC6'H,
-      cost 2060,
-      subtypes { preimageSha256 }
+    PreimageFulfillment ::= SEQUENCE {
+      preimage             OCTET STRING
     }
 
-  exampleThresholdFulfillment2 Fulfillment ::=
-    thresholdSha256Fulfillment : {
-      subfulfillments { preimageSha256Fulfillment : { preimage ''H } },
-      subconditions {
-        preimageSha256Condition : {
-          fingerprint '7F83B165 7FF1FC53 B92DC181 48A1D65D FC2D4B1F A3D67728 4ADDD200 126D9069'H,
-          cost 12
-        }
-      }
+    PrefixFulfillment ::= SEQUENCE {
+      prefix               OCTET STRING,
+      maxMessageLength     INTEGER (0..4294967295),
+      subfulfillment       Fulfillment
     }
 
-  exampleThresholdFingerprintContents2 ThresholdFingerprintContents ::= {
-    threshold 1,
-    subconditions {
-      preimageSha256Condition : {
-        fingerprint 'E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855'H,
-        cost 0
-      },
-      preimageSha256Condition : {
-        fingerprint '7F83B165 7FF1FC53 B92DC181 48A1D65D FC2D4B1F A3D67728 4ADDD200 126D9069'H,
-        cost 12
-      }
-    }
-  }
-
-  exampleRsaCondition Condition ::=
-    rsaSha256Condition : {
-      fingerprint 'B31FA8206E4EA7E515337B3B33082B877651801085ED84FB4DAEB247BF698D7F'H,
-      cost 65536
+    ThresholdFulfillment ::= SEQUENCE {
+      subfulfillments      SET OF Fulfillment,
+      subconditions        SET OF Condition
     }
 
-  exampleRsaFulfillment Fulfillment ::=
-    rsaSha256Fulfillment : {
-      modulus 'E1EF8B24D6F76B09C81ED7752AA262F044F04A874D43809D31CEA612F99B0C97A8B4374153E3EEF3D66616843E0E41C293264B71B6173DB1CF0D6CD558C58657706FCF097F704C483E59CBFDFD5B3EE7BC80D740C5E0F047F3E85FC0D75815776A6F3F23C5DC5E797139A6882E38336A4A5FB36137620FF3663DBAE328472801862F72F2F87B202B9C89ADD7CD5B0A076F7C53E35039F67ED17EC815E5B4305CC63197068D5E6E579BA6DE5F4E3E57DF5E4E072FF2CE4C66EB452339738752759639F0257BF57DBD5C443FB5158CCE0A3D36ADC7BA01F33A0BB6DBB2BF989D607112F2344D993E77E563C1D361DEDF57DA96EF2CFC685F002B638246A5B309B9'H,
-      signature '48E8945EFE007556D5BF4D5F249E4808F7307E29511D3262DAEF61D88098F9AA4A8BC0623A8C975738F65D6BF459D543F289D73CBC7AF4EA3A33FBF3EC4440447911D72294091E561833628E49A772ED608DE6C44595A91E3E17D6CF5EC3B2528D63D2ADD6463989B12EEC577DF6470960DF6832A9D84C360D1C217AD64C8625BDB594FB0ADA086CDECBBDE580D424BF9746D2F0C312826DBBB00AD68B52C4CB7D47156BA35E3A981C973863792CC80D04A180210A52415865B64B3A61774B1D3975D78A98B0821EE55CA0F86305D42529E10EB015CEFD402FB59B2ABB8DEEE52A6F2447D2284603D219CD4E8CF9CFFDD5498889C3780B59DD6A57EF7D732620'H
+    RsaSha256Fulfillment ::= SEQUENCE {
+      modulus              OCTET STRING,
+      signature            OCTET STRING
     }
 
-  exampleRsaFingerprintContents RsaFingerprintContents ::= {
-    modulus 'E1EF8B24D6F76B09C81ED7752AA262F044F04A874D43809D31CEA612F99B0C97A8B4374153E3EEF3D66616843E0E41C293264B71B6173DB1CF0D6CD558C58657706FCF097F704C483E59CBFDFD5B3EE7BC80D740C5E0F047F3E85FC0D75815776A6F3F23C5DC5E797139A6882E38336A4A5FB36137620FF3663DBAE328472801862F72F2F87B202B9C89ADD7CD5B0A076F7C53E35039F67ED17EC815E5B4305CC63197068D5E6E579BA6DE5F4E3E57DF5E4E072FF2CE4C66EB452339738752759639F0257BF57DBD5C443FB5158CCE0A3D36ADC7BA01F33A0BB6DBB2BF989D607112F2344D993E77E563C1D361DEDF57DA96EF2CFC685F002B638246A5B309B9'H
-  }
-
-  exampleEd25519Condition Condition ::=
-    ed25519Sha256Condition : {
-      fingerprint '799239ABA8FC4FF7EABFBC4C44E69E8BDFED993324E12ED64792ABE289CF1D5F'H,
-      cost 131072
+    Ed25519Sha512Fulfillment ::= SEQUENCE {
+      publicKey            OCTET STRING (SIZE(32)),
+      signature            OCTET STRING (SIZE(64))
     }
 
-  exampleEd25519Fulfillment Fulfillment ::=
-    ed25519Sha256Fulfillment : {
-      publicKey 'D75A980182B10AB7D54BFED3C964073A0EE172F3DAA62325AF021A68F707511A'H,
-      signature 'E5564300C360AC729086E2CC806E828A84877F1EB8E5D974D873E065224901555FB8821590A33BACC61E39701CF9B46BD25BF5F0595BBE24655141438E7A100B'H
+    -- Fingerprint Content
+
+    -- The PREIMAGE-SHA-256 condition fingerprint content is not DER encoded
+    -- The fingerprint content is the preimage
+
+    PrefixFingerprintContents ::= SEQUENCE {
+      prefix               OCTET STRING,
+      maxMessageLength     INTEGER (0..4294967295),
+      subcondition         Condition
     }
 
-  exampleEd25519FingerprintContents Ed25519FingerprintContents ::= {
-    publicKey 'D75A980182B10AB7D54BFED3C964073A0EE172F3DAA62325AF021A68F707511A'H
-  }
-
-  /**
-   * COSTS
-   *
-   * Preimage: length in bytes
-   * Prefix: length_of_prefix + max_message_length + subcondition_cost + 1024
-   * RSA: (modulus in bits)^2 / 64
-   * Ed25519: 131072
-   * Threshold (t/n): sum(biggest(t, subcondition_costs)) + 1024 * n
-   */
-
+    ThresholdFingerprintContents ::= SEQUENCE {
+      threshold            INTEGER (1..65535),
+      subconditions        SET OF Condition
+    }
+    
+    RsaFingerprintContents ::= SEQUENCE {
+      modulus              OCTET STRING
+    }
+    
+    Ed25519FingerprintContents ::= SEQUENCE {
+      publicKey            OCTET STRING (SIZE(32))
+    }
+        
 END

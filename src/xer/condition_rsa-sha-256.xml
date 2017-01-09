@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Condition>
-  <rsaSha256Condition>
+  <rsaSha256>
     <fingerprint>
       {{fingerprint}}
     </fingerprint>
     <cost>{{cost}}</cost>
-  </rsaSha256Condition>
+  </rsaSha256>
 </Condition>
