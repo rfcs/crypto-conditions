@@ -10,7 +10,7 @@ Known implementations of Crypto Conditions:
 
 * JavaScript: https://github.com/interledgerjs/five-bells-condition
 * Java: https://github.com/interledger/java-crypto-conditions
-* Python: https://github.com/bigchaindb/cryptoconditions
+* Python: https://github.com/bigchaindb/cryptoconditions (only supports version 01 of the draft for now)
 * Go: https://github.com/jtremback/crypto-conditions
 
 (Note that all of the above implementations currently need testing/updating. As soon as we have run a decent sized test suite against the implementations above, we'll provide the results here.)
