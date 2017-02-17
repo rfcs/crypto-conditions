@@ -2,7 +2,7 @@
 
 ## Spec
 
-You can find the spec here: https://tools.ietf.org/html/draft-thomas-crypto-conditions-01
+You can find the spec here: https://tools.ietf.org/html/draft-thomas-crypto-conditions-02
 
 ## Implementations
 
