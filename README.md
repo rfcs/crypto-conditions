@@ -2,7 +2,9 @@
 
 ## Spec
 
-You can find the spec here: https://tools.ietf.org/html/draft-thomas-crypto-conditions-01
+You can find the spec here: https://tools.ietf.org/html/draft-thomas-crypto-conditions-02
+
+The source code for the spec is in `src/spec/crypto-conditions.md`
 
 ## Implementations
 
@@ -45,3 +47,18 @@ The test vectors themselves are generated from example data in the `src/test-vec
 ## Generating Tests
 
 The ffasn1dump tool is used to produce DER encodings. It is available from http://bellard.org/ffasn1
+
+## Generating the Spec
+
+Uses [kramdown-rfc2629](https://github.com/cabo/kramdown-rfc2629/), [xml2rfc](http://xml2rfc.ietf.org/) and [Grunt](http://gruntjs.com/) with [Grunt kramdown_rfc2629 task](https://github.com/hildjj/grunt-kramdown-rfc2629/)
+
+
+From root directory of the repo run:
+
+    npm install
+    grunt kramdown-rfc2629
+   
+To watch edits to `crypto-conditions.md` and auto-generate output when changes are saved run:
+
+    grunt watch
+    

@@ -5,7 +5,8 @@
   "main": "index.js",
   "scripts": {
     "build": "rm -f test-vectors/valid/*; node scripts/generate_test_vectors.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "spec": "rm -f dist/spec/crypto-conditions.*; grunt kramdown_rfc2629"
   },
   "repository": {
     "type": "git",
@@ -36,6 +37,9 @@
     "eslint-config-standard": "^6.2.1",
     "eslint-plugin-promise": "^3.4.0",
     "eslint-plugin-standard": "^2.0.1",
+    "grunt": "^1.0.1",
+    "grunt-contrib-watch": "^1.0.0",
+    "grunt-kramdown-rfc2629": "0.0.2",    
     "lodash": "^4.17.2",
     "mustache": "^2.3.0",
     "node-rsa": "^0.4.2",
