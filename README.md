@@ -27,6 +27,8 @@ In order to verify the different implementations, we provide a series of test ve
 
   * Parse `conditionBinary`, serialize as a URI, should match `conditionUri`.
   * Parse `conditionUri`, serialize as binary, should match `conditionBinary`.
+  * Parse `conditionBinary` and validate, should return true.
+  * Parse `conditionUri` and validate, should return true.
   * Parse `fulfillment`, serialize fulfillment, should match `fulfillment`.
   * Parse `fulfillment` and validate, should return true.
   * Parse `fulfillment` and generate the fingerprint contents
