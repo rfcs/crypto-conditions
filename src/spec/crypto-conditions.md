@@ -866,7 +866,7 @@ The cost parameter is the cost of the condition that is represented by the URI.
 
 ### Parameter: Subtypes (subtypes)
 
-The subtypes parameter indicates the types of conditions that are subtypes of the condition represented by the URI. The value MUST be a comma seperated list of names from the [Crypto-Condition Type Registry](#crypto-conditions-type-registry) and SHOULD not include the type of the root crypto-condition. i.e. The value of the fpt paramtere should not appear in the list of types provided as the value of the subtypes parameter.
+The subtypes parameter indicates the types of conditions that are subtypes of the condition represented by the URI. The value MUST be a comma seperated list of names from the [Crypto-Condition Type Registry](#crypto-conditions-type-registry) and SHOULD not include the type of the root crypto-condition. i.e. The value of the fpt parameter should not appear in the list of types provided as the value of the subtypes parameter.
 
 # Example Condition
 
