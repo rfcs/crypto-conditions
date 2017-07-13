@@ -50,6 +50,7 @@ author:
     uri: https://www.ripple.com
 
 normative:
+    RFC3986:
     RFC3280:
     RFC4055:
     RFC4648:
@@ -871,6 +872,8 @@ The subtypes parameter indicates the types of conditions that are subtypes of th
 The list MUST exclude the type of the root crypto-condition. i.e. The value of the fpt parameter should not appear in the list of types provided as the value of the subtypes parameter.
 
 The list MUST be ordered by the type id value of each type, in ascending order. i.e. preimage-sha-256 MUST appear before prefix-sha-256.
+
+The commas in the list should be treated as reserved characters per [RFC3986](#RFC3986)and not be percent encoded when used as list delimiters in the subtypes parameter.
 
 # Example Condition
 
