@@ -788,14 +788,14 @@ The public key and signature are a fixed size therefore the cost for an ED25519 
 ### ASN.1 {#ed25519-sha-256-condition-asn1}
 
     -- Condition Fingerprint
-    Ed25519Sha512Fulfillment ::= SEQUENCE {
-      publicKey            OCTET STRING (SIZE(32)),
-      signature            OCTET STRING (SIZE(64))
+    Ed25519FingerprintContents ::= SEQUENCE {
+      publicKey            OCTET STRING (SIZE(32))
     }
 
     -- Fulfillment 
-    Ed25519FingerprintContents ::= SEQUENCE {
-      publicKey            OCTET STRING (SIZE(32))
+    Ed25519Sha512Fulfillment ::= SEQUENCE {
+      publicKey            OCTET STRING (SIZE(32)),
+      signature            OCTET STRING (SIZE(64))
     }
 
 ### Condition Format {#ed25519-sha-256-condition-type-condition}
