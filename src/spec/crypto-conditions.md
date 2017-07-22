@@ -103,11 +103,26 @@ informative:
         target: http://csrc.nist.gov/publications/nistpubs/800-57/sp800-57_part1_rev3_general.pdf
         date: 2012-07
         author:
-            - fullname: Elaine Barker
-            - fullname: William Barker
-            - fullname: William Burr
-            - fullname: William Polk
-            - fullname: Miles Smid
+            - 
+              initials: E.B.
+              surname: Barker
+              fullname: Elaine Barker
+            - 
+              initials: W.B.
+              surname: Barker
+              fullname: William Barker
+            - 
+              initials: W.B.
+              surname: Burr
+              fullname: William Burr
+            - 
+              initials: W.P.
+              surname: Polk
+              fullname: William Polk
+            - 
+              initials: M.S. 
+              surname: Smid
+              fullname: Miles Smid
     OPENSSL-X509-CERT-EXAMPLES:
         title: OpenSSL - X509 certificate examples for testing and verification
         target: http://fm4dd.com/openssl/certexamples.htm
@@ -859,7 +874,7 @@ While [RFC6920](#RFC6920) allows for truncated hashes, implementations using the
 
 ### Parameter: Fingerprint Type (fpt)
 
-The type parameter indicates the type of condition that is represented by the URI. The value MUST be one of the names from the [Crypto-Condition Type Registry](#crypto-conditions-type-registry).
+The `type` parameter indicates the type of condition that is represented by the URI. The value MUST be one of the names from the [Crypto-Condition Type Registry](#crypto-conditions-type-registry).
 
 ### Parameter: Cost (cost)
 
@@ -867,13 +882,26 @@ The cost parameter is the cost of the condition that is represented by the URI.
 
 ### Parameter: Subtypes (subtypes)
 
-The subtypes parameter indicates the types of conditions that are subtypes of the condition represented by the URI. The value MUST be a comma seperated list of names from the [Crypto-Condition Type Registry](#crypto-conditions-type-registry).
+The subtypes parameter indicates the types of conditions that are subtypes of the condition represented by the URI. The value MUST be a comma-separated list of names from the [Crypto-Condition Type Registry](#crypto-conditions-type-registry).
 
-The list MUST exclude the type of the root crypto-condition. i.e. The value of the fpt parameter should not appear in the list of types provided as the value of the subtypes parameter.
+The subtypes list MUST exclude the type of the root crypto-condition. Specifically, the value of the `fpt` parameter should not appear in the list of subtypes.
 
-The list MUST be ordered by the type id value of each type, in ascending order. i.e. preimage-sha-256 MUST appear before prefix-sha-256.
+For example, if a threshold condition contains another threshold condition as well as a prefix condition, then its URI query parameters would appear like this: 
 
-The commas in the list should be treated as reserved characters per [RFC3986](#RFC3986)and not be percent encoded when used as list delimiters in the subtypes parameter.
+    ni:///...?cost=30&fpt=threshold-sha-256&subtypes=prefix-sha-256
+
+Notice that the `subtypes` parameter does not contain `threshold-sha-256` because that type is already indicated in the `fpt` parameter.
+
+The commas in the list should be treated as reserved characters per [RFC3986](#RFC3986) and MUST not be percent encoded when used as list delimiters in the subtypes parameter.
+
+#### Subtype Parameter Value Ordering
+
+The subtypes list MUST be ordered by the type id value of each type, in ascending lexicographical order. That is, `preimage-sha-256` MUST appear before `prefix-sha-256`, which MUST appear before `threshold-sha-256`, and so on.
+
+## Condition URI Parameter Ordering
+
+The parameters of a condition URI MUST appear in ascending lexicographical order based upon the
+  name of each parameter. For example, the `cost` parameter must appear before the `fpt` parameter, which must appear before the `subtypes` parameter.
 
 # Example Condition
 
