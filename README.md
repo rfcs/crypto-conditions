@@ -14,6 +14,7 @@ Known implementations of Crypto Conditions:
 * Java: https://github.com/interledger/java-crypto-conditions
 * Python: https://github.com/bigchaindb/cryptoconditions
 * Go: https://github.com/jtremback/crypto-conditions
+* Haskell: https://github.com/libscott/cryptoconditions-hs
 
 (Note that all of the above implementations currently need testing/updating. As soon as we have run a decent sized test suite against the implementations above, we'll provide the results here.)
 
