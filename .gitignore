@@ -1,3 +1,5 @@
 /dist/*
 !/dist/README.txt
 /node_modules/
+/.DS_Store
+/.idea

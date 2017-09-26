@@ -57,7 +57,7 @@ Uses [kramdown-rfc2629](https://github.com/cabo/kramdown-rfc2629/), [xml2rfc](ht
 From root directory of the repo run:
 
     npm install
-    grunt kramdown-rfc2629
+    grunt kramdown_rfc2629
    
 To watch edits to `crypto-conditions.md` and auto-generate output when changes are saved run:
 

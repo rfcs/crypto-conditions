@@ -1,1 +1,1 @@
-ni:///sha-256;{{fingerprint}}?fpt=preimage-sha-256&cost={{cost}}
+ni:///sha-256;{{fingerprint}}?cost={{cost}}&fpt=preimage-sha-256
