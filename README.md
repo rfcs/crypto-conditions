@@ -11,7 +11,7 @@ The source code for the spec is in `src/spec/crypto-conditions.md`
 Known implementations of Crypto Conditions:
 
 * JavaScript: https://github.com/interledgerjs/five-bells-condition
-* Java: https://github.com/interledger/java-crypto-conditions
+* Java: https://github.com/hyperledger/quilt/tree/master/crypto-conditions
 * Python: https://github.com/bigchaindb/cryptoconditions
 * Go:
   * https://github.com/go-interledger/cryptoconditions
