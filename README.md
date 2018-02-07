@@ -17,6 +17,7 @@ Known implementations of Crypto Conditions:
   * https://github.com/go-interledger/cryptoconditions
   * https://github.com/jtremback/crypto-conditions
 * Haskell: https://github.com/libscott/cryptoconditions-hs
+* C: https://github.com/libscott/libcryptoconditions
 
 (Note that all of the above implementations currently need testing/updating. As soon as we have run a decent sized test suite against the implementations above, we'll provide the results here.)
 
