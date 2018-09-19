@@ -2,7 +2,7 @@
 
 ## Spec
 
-You can find the spec here: https://tools.ietf.org/html/draft-thomas-crypto-conditions-03
+You can find the spec here: https://tools.ietf.org/html/draft-thomas-crypto-conditions-04
 
 The source code for the spec is in `src/spec/crypto-conditions.md`
 
