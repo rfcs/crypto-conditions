@@ -282,7 +282,7 @@ A description of crypto-conditions is provided in this document using Abstract S
 
 ## Encoding Rules
 
-Implementations of this specificiation MUST support encoding and decoding using Distinguished Encoding Rules (DER) as defined in [ITU.X690.2015](#itu.X690.2015). This is the canonical encoding format.
+Implementations of this specification MUST support encoding and decoding using Distinguished Encoding Rules (DER) as defined in [ITU.X690.2015](#itu.X690.2015). This is the canonical encoding format.
 
 Alternative encodings may be used to represent top-level conditions and fulfillments but to ensure a determinisitic outcome in producing the condition fingerprint content, including any sub-conditions, MUST be DER encoded prior to hashing.
 
@@ -896,7 +896,7 @@ The commas in the list should be treated as reserved characters per [RFC3986](#R
 
 #### Subtype Parameter Value Ordering
 
-The subtypes list MUST be ordered by the type id value of each type, in ascending lexicographical order. That is, `preimage-sha-256` MUST appear before `prefix-sha-256`, which MUST appear before `threshold-sha-256`, and so on.
+The subtypes list MUST be ordered by the lower-cased name value of each type in ascending lexicographical order. That is, `ed25519-sha-256` MUST appear before `prefix-sha-256`, which MUST appear before `preimage-sha-256`, which MUST appear before `rsa-sha-256`, which MUST appear before `threshold-sha-256`.
 
 ## Condition URI Parameter Ordering
 
@@ -911,7 +911,7 @@ An example condition (PREIMAGE-SHA-256):
     0x00000010 48 A1 D6 5D FC 2D 4B 1F A3 D6 77 28 4A DD D2 00 H..].-K...w(J...
     0x00000020 12 6D 90 69 81 01 0C                            .m.i...
     
-    ni:///sha-256;f4OxZX_x_FO5LcGBSKHWXfwtSx-j1ncoSt3SABJtkGk?fpt=preimage-sha-256&cost=12
+    ni:///sha-256;f4OxZX_x_FO5LcGBSKHWXfwtSx-j1ncoSt3SABJtkGk?cost=12&fpt=preimage-sha-256
 
 The example has the following attributes:
 
@@ -927,7 +927,7 @@ The example has the following attributes:
 
 # Security Considerations
 
-This specification has a normative dependency on a number of other specifications with extensive security considerations therefore the consideratons defined for SHA-256 hashing and RSA signatures in [RFC8017](#RFC8017) and [RFC4055](#RFC4055) and for ED25519 signatures in [I-D.irtf-cfrg-eddsa](#I-D.irtf-cfrg-eddsa) must be considered.
+This specification has a normative dependency on a number of other specifications with extensive security considerations therefore the considerations defined for SHA-256 hashing and RSA signatures in [RFC8017](#RFC8017) and [RFC4055](#RFC4055) and for ED25519 signatures in [I-D.irtf-cfrg-eddsa](#I-D.irtf-cfrg-eddsa) must be considered.
 
 The cost and subtypes values of conditions are provided to allow implementations to evaluate their ability to validate a fulfillment for the given condition later.
 
@@ -1048,5 +1048,5 @@ The following types are registered:
 | 1       | PREFIX-SHA-256    |
 | 2       | THRESHOLD-SHA-256 |
 | 3       | RSA-SHA-256       |
-| 4       | ED25519           |
+| 4       | ED25519-SHA-256   |
 {: #crypto-condition-types-table title="Crypto-Condition Types"}
